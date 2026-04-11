@@ -2,8 +2,8 @@ name: Paradise Minecraft
 on:
   workflow_dispatch:
   schedule:
-    # 4:00 AM UTC = 9:30 AM IST. Runs Sat, Sun, and Mon to cover the 45 hours.
-    - cron: '0 * * * 6,0,1' 
+    # 4:00 AM UTC = 9:30 AM IST Saturday
+    - cron: '0 4 * * 6'
 
 jobs:
   run:
@@ -12,40 +12,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check IST Time Window
+      - name: Check Weekend Window
         run: |
-          # 45 hours from Sat 9:30 AM IST ends on Monday 6:30 AM IST.
+          # Ends session at Monday 6:30 AM IST (45 hours total)
           HOUR_IST=$(date -d "+5 hours +30 minutes" +%H)
           DAY_IST=$(date -d "+5 hours +30 minutes" +%u)
-          
           if [ "$DAY_IST" -eq 1 ] && [ "$HOUR_IST" -ge 7 ]; then
-            echo "Paradise Minecraft weekend session ended. See you next week!"
+            echo "Weekend window closed. Goodbye!"
             exit 1
           fi
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '25' # 26.1.x requires Java 25
+          java-version: '25'
           distribution: 'temurin'
 
-      - name: Configure Latest Fabric & Cracked
+      - name: Configure Server
         run: |
-          # Version 26.1.1 is the current stable release
-          echo "VERSION=26.1.1" >> $GITHUB_ENV
+          echo "VERSION=26.1.2" >> $GITHUB_ENV
           echo "TYPE=FABRIC" >> $GITHUB_ENV
-          
-          # Force Cracked Mode (Offline Mode)
-          if [ -f server.properties ]; then
-            sed -i 's/online-mode=true/online-mode=false/g' server.properties
-          else
-            echo "online-mode=false" > server.properties
-          fi
+          # Force Cracked Mode
+          [ -f server.properties ] && sed -i 's/online-mode=true/online-mode=false/g' server.properties || echo "online-mode=false" > server.properties
 
-      - name: Run Server
+      - name: Run Paradise Minecraft
         run: |
           chmod +x ./start.sh
-          ./start.sh
+          # Run server and capture PID
+          ./start.sh &
+          SERVER_PID=$!
+          
+          # GitHub Actions timeout is 6 hours (21600s). 
+          # We stop at 5h 45m (20700s) to save the world safely.
+          sleep 20700
+          kill $SERVER_PID
+          echo "Saving world and restarting session..."
+          
+          # Trigger auto-restart
+          curl -X POST -H "Authorization: token ${{ secrets.FINE_GRAINED_PAT }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://github.com{{ github.repository }}/actions/workflows/blank.yml/dispatches \
+          -d '{"ref":"main"}'
         env:
           PLAYIT_SECRET: ${{ secrets.PLAYIT_SECRET }}
           GITHUB_TOKEN: ${{ secrets.FINE_GRAINED_PAT }}
