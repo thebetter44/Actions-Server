@@ -1,19 +1,21 @@
 #!/bin/bash
 
-# 1. Download the correct Playit.gg Agent (Direct Binary)
+# 1. Clean up old corrupt files
+rm -f playit fabric-server-launch.jar eula.txt
+
+# 2. Download Playit.gg using wget (Safe Mode)
 echo "Setting up Playit.gg..."
-curl -L -o playit https://github.com
+wget -q --show-progress -O playit https://github.com
 chmod +x playit
 ./playit --secret $PLAYIT_SECRET &
 
-# 2. Download the actual Fabric Server JAR (Direct Meta Link)
+# 3. Download Fabric Server using wget (Safe Mode)
 echo "Downloading Fabric Server..."
-rm -f fabric-server-launch.jar
-curl -L -o fabric-server-launch.jar https://fabricmc.net
+wget -q --show-progress -O fabric-server-launch.jar https://fabricmc.net
 
-# 3. Accept EULA
+# 4. Accept EULA
 echo "eula=true" > eula.txt
 
-# 4. Start Minecraft
+# 5. Launch Paradise Minecraft
 echo "Launching Paradise Minecraft..."
 java -Xms8G -Xmx12G -jar fabric-server-launch.jar nogui
