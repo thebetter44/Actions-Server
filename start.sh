@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 1. Download the correct Playit.gg Agent (Direct Binary)
+# 1. Download Playit.gg (Direct File)
 echo "Setting up Playit.gg..."
 curl -L -o playit https://github.com
 chmod +x playit
 ./playit --secret $PLAYIT_SECRET &
 
-# 2. Download the actual Fabric Server JAR (Direct Meta Link)
+# 2. Download Fabric Server (Direct File)
 echo "Downloading Fabric Server..."
 rm -f fabric-server-launch.jar
 curl -L -o fabric-server-launch.jar https://fabricmc.net
