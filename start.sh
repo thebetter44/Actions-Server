@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# 1. Use the Portable Playit Binary (No installation needed)
+# 1. Download the correct Playit.gg Agent
 echo "Setting up Playit.gg..."
 wget -O playit https://github.com
 chmod +x playit
 ./playit --secret $PLAYIT_SECRET &
 
-# 2. Download a Guaranteed Working Fabric JAR (Version 1.21.4)
+# 2. Download the actual Fabric Server JAR
 echo "Downloading Fabric Server..."
 rm -f fabric-server-launch.jar
-wget -O fabric-server-launch.jar "https://fabricmc.net"
+wget -O fabric-server-launch.jar https://fabricmc.net
 
 # 3. Accept EULA
 echo "eula=true" > eula.txt
