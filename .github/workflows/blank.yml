@@ -56,3 +56,4 @@ jobs:
         env:
           PLAYIT_SECRET: ${{ secrets.PLAYIT_SECRET }}
           GITHUB_TOKEN: ${{ secrets.FINE_GRAINED_PAT }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
